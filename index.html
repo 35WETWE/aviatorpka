@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>aviator predictor</title>
+    <style>
+        :root {
+            --primary: #E7180B;
+            --bg-body: #1a1a1a;
+            --app-bg: #ffffff;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--bg-body);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .main-container {
+            width: 100%;
+            max-width: 470px;
+            height: 100vh;
+            background: var(--app-bg);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        .app-header {
+            background: var(--primary);
+            padding: 10px 10px;
+            font-size: 10px;
+            font-weight: 740;
+            text-align: center;
+            color: white;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+        }
+
+        .history-bar {
+            background: #000;
+            padding: 8px;
+            display: flex;
+            gap: 5px;
+            overflow-x: auto;
+            min-height: 40px;
+            border-bottom: 1px solid #000;
+            align-items: center;
+        }
+        .history-bar::-webkit-scrollbar { display: none; }
+
+        .payout-tag {
+            font-size: 11px;
+            font-weight: 740;
+            padding: 3px 8px;
+            border-radius: 6px;
+            background: white;
+            border: 2px solid #000;
+            color: var(--primary);
+            white-space: nowrap;
+            animation: slideIn 1.0s ease-out;
+        }
+        @keyframes slideIn { from { transform: translateX(-20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        .content {
+            flex: 1;
+            padding: 15px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            overflow-y: auto;
+        }
+
+        .logo-box img {
+            width: 135px;
+            height: auto;
+        }
+
+        .status-msg {
+            font-size: 11px;
+            color: var(--primary);
+            font-weight: 740;
+            text-transform: uppercase;
+            margin: 5px 0;
+            text-align: center;
+        }
+
+        .prediction-area {
+            position: relative;
+            width: 140px;
+            height: 140px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+        #alert-icon {
+            position: absolute;
+            width: 50px;
+            top: -15px;
+            display: none;
+            z-index: 50;
+            filter: drop-shadow(0 0 15px rgba(231, 24, 11, 0.9));
+            animation: warningPulse 0.5s infinite alternate;
+        }
+        @keyframes warningPulse { from { transform: scale(1); } to { transform: scale(1.1); } }
+
+        .progress-ring { transform: rotate(-90deg); width: 160px; height: 160px; }
+        .progress-ring__bg { stroke: #f0f0f0; stroke-width: 10; fill: transparent; r: 70; cx: 80; cy: 80; }
+        #prog-bar {
+            stroke: var(--primary);
+            stroke-width: 10;
+            stroke-linecap: round;
+            fill: transparent;
+            r: 70; cx: 80; cy: 80;
+            stroke-dasharray: 440;
+            stroke-dashoffset: 440;
+            transition: stroke-dashoffset 0.1s linear;
+        }
+
+        #result-display {
+            position: absolute;
+            font-size: 34px;
+            font-weight: 740;
+            color: var(--primary);
+        }
+
+        .casino-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 6px;
+            width: 100%;
+            margin: 8px 0;
+        }
+
+        .casino-btn {
+            aspect-ratio: 1 / 1;
+            border: 2px solid #eee;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #DAB2FF;
+            transition: 0.5s;
+            overflow: hidden;
+            padding: 4px;
+        }
+        .casino-btn img { width: 100%; height: 100%; object-fit: contain; }
+        .casino-btn.selected {
+            border-color: #000;
+            background: #b184f5;
+            transform: scale(1.05);
+            border-width: 3px;
+        }
+
+        .next-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 16px 0;
+            width: 100%;
+            font-size: 16px;
+            font-weight: 740;
+            border-radius: 15px;
+            cursor: pointer;
+            box-shadow: 0 5px 0 #b30000;
+            transition: 0.1s;
+            text-transform: uppercase;
+        }
+        .next-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #b30000; }
+        .next-btn:disabled { background: #555; box-shadow: none; color: #ccc; cursor: not-allowed; }
+
+        .security-footer {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            padding: 10px 0;
+            font-size: 12px;
+            font-weight: 740;
+            color: var(--primary);
+            background: #f9f9f9;
+            border-top: 1px solid #eee;
+        }
+
+        #login-screen {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: linear-gradient(160deg,#000,#1a1a1a);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            padding: 20px;
+        }
+        .login-box {
+            width: 100%;
+            max-width: 350px;
+            background: white;
+            padding: 40px 30px;
+            border-radius: 25px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+        }
+        .login-input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            border: 2px solid var(--primary);
+            font-size: 16px;
+        }
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 740;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<audio id="count-sound" src="https://assets.mixkit.co/active_storage/sfx/916/916-preview.mp3" preload="auto"></audio>
+<audio id="win-sound" src="https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3" preload="auto"></audio>
+
+<div id="login-screen">
+    <div class="login-box">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSFbiXr3I7b5I4H5zry3gOObdlyQkRdXeP9fg&s" style="width:140px; margin-bottom:15px;">
+        <h2 style="color:var(--primary)">Aviator Predictor</h2>
+        <input id="user" type="text" placeholder="Correo Electrónico" class="login-input">
+        <input id="pass" type="password" placeholder="Contraseña" class="login-input">
+        <button onclick="login()" class="login-btn">INGRESAR</button>
+        <p id="login-msg" style="color:red; font-size:12px; margin-top:10px;"></p>
+    </div>
+</div>
+
+<div class="main-container">
+    <div class="app-header">ＡＶＩＡＴＯＲ ＰＲＥＤＩＣＴＯＲ</div>
+    <div class="history-bar" id="historyBar"></div>
+
+    <div class="content">
+        <div class="logo-box">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSFbiXr3I7b5I4H5zry3gOObdlyQkRdXeP9fg&s">
+        </div>
+
+        <div class="status-msg" id="status">¡OPRIME TU CASINO!</div>
+
+        <div class="prediction-area">
+            <img id="alert-icon" src="https://images.icon-icons.com/461/PNG/96/money_43847.png">
+            <svg class="progress-ring" viewBox="0 0 160 160">
+                <circle class="progress-ring__bg"/>
+                <circle id="prog-bar"/>
+            </svg>
+            <div id="result-display">1.00x</div>
+        </div>
+
+        <div class="casino-selection-zone">
+            <div style="font-size: 10px; font-weight: 800; text-align: center; color: #333; margin-bottom: 5px;">SELECCIONAR TU CASINO PARA PREDECIR</div>
+            <div class="casino-grid">
+                <div class="casino-btn" onclick="selCas(this)"><img src="https://image2url.com/r2/default/images/1772156226188-84436544-df13-4900-9c0a-4922454ac35a.jpg"></div>
+                <div class="casino-btn" onclick="selCas(this)"><img src="https://image2url.com/r2/default/images/1772156718063-9d7f327c-3f38-4c54-a4af-8b6902096337.png"></div>
+                <div class="casino-btn" onclick="selCas(this)"><img src="https://image2url.com/r2/default/images/1772156777400-140ec198-b410-4c90-963e-b6a7b3b8ffe5.png"></div>
+                <div class="casino-btn" onclick="selCas(this)"><img src="https://image2url.com/r2/default/images/1772156881655-81bb1ea5-ffc0-4f39-9b03-e596eb0da86e.png"></div>
+                <div class="casino-btn" onclick="selCas(this)"><img src="https://image2url.com/r2/default/images/1772156926302-a55f9d48-c419-40a3-bdbc-2a320d061d87.png"></div>
+                <div class="casino-btn" onclick="selCas(this)"><img src="https://image2url.com/r2/default/images/1772157099303-685401df-2dba-48d6-ad22-89115f5dfb1b.png"></div>
+                <div class="casino-btn" onclick="selCas(this)"><img src="https://image2url.com/r2/default/images/1772157139259-9ff0140d-73a3-4141-b928-661681cb29a0.png"></div>
+                <div class="casino-btn" onclick="selCas(this)"><img src="https://image2url.com/r2/default/images/1772157235100-e2589491-3023-4dd7-a3bf-f05fef4c349d.png"></div>
+                <div class="casino-btn" onclick="selCas(this)"><img src="https://image2url.com/r2/default/images/1772157291495-d6069e42-b827-4bc1-add5-4e7fb9a90656.jpg"></div>
+                <div class="casino-btn" onclick="selCas(this)"><img src="https://image2url.com/r2/default/images/1772157380024-78169a5a-68bd-4a96-b234-d773ddd3cff5.png"></div>
+            </div>
+            <button class="next-btn" id="btn" onclick="runSequence()" disabled>Siguiente Ronda</button>
+        </div>
+    </div>
+
+    <div class="security-footer">
+        <img src="https://images.icon-icons.com/2232/PNG/96/telegram_logo_icon_134592.png" style="width: 16px;">
+        <span>ＡＶＩＡＴＯＲＰＫＡ</span>
+    </div>
+</div>
+
+<script>
+    const USER_CORRECTO = "aviatorpka@gmail.com";
+    const PASS_CORRECTA = "283212345678";
+    const misSeñales = [2.15, 1.70, 3.00, 2.33, 2.51, 2.11];
+    let step = 0;
+
+    function login(){
+        const user = document.getElementById("user").value;
+        const pass = document.getElementById("pass").value;
+        const msg = document.getElementById("login-msg");
+        if(user === USER_CORRECTO && pass === PASS_CORRECTA){
+            document.getElementById("login-screen").style.display = "none";
+        } else {
+            msg.innerText = "Usuario o contraseña incorrectos";
+            document.getElementById("pass").value = "";
+        }
+    }
+
+    function selCas(el) {
+        document.querySelectorAll('.casino-btn').forEach(b => b.classList.remove('selected'));
+        el.classList.add('selected');
+        document.getElementById('btn').disabled = false;
+        document.getElementById('status').innerText = "VINCULACIÓN EXITOSA";
+    }
+
+    function playBeep() {
+        const audio = document.getElementById('count-sound');
+        if (audio) {
+            audio.volume = 0.0; 
+            audio.currentTime = 0.3;
+            audio.play().catch(e => console.log("Audio de conteo esperando interacción"));
+        }
+    }
+
+    function runSequence() {
+        const display = document.getElementById('result-display');
+        const btn = document.getElementById('btn');
+        const status = document.getElementById('status');
+        const progBar = document.getElementById('prog-bar');
+        
+        btn.disabled = true;
+        document.getElementById('alert-icon').style.display = "none";
+        progBar.style.strokeDashoffset = 440;
+        
+        let count = 3;
+        status.innerText = "INICIANDO PREDICTOR...";
+        display.innerText = count;
+        playBeep();
+
+        let timer = setInterval(() => {
+            count--;
+            if (count >= 1) {
+                display.innerText = count;
+                playBeep();
+            } else {
+                clearInterval(timer);
+                // Inicia la animación del multiplicador
+                startAnalysis();
+            }
+        }, 1000); // 1 segundo exacto entre números
+    }
+
+    function startAnalysis() {
+        const display = document.getElementById('result-display');
+        const status = document.getElementById('status');
+        const alertImg = document.getElementById('alert-icon');
+        const history = document.getElementById('historyBar');
+        const btn = document.getElementById('btn');
+        const progBar = document.getElementById('prog-bar');
+        const winAudio = document.getElementById('win-sound');
+
+        const target = misSeñales[step];
+        step = (step + 1) % misSeñales.length;
+
+        let val = 1.00;
+        status.innerText = "PREDICCIÓN EN TIEMPO REAL!";
+
+        let loop = setInterval(() => {
+            val += 0.01;
+            display.innerText = val.toFixed(2) + "x";
+
+            let p = (val - 1) / (target - 1);
+            progBar.style.strokeDashoffset = 440 - (p * 440); 
+
+            if (val >= target) {
+                clearInterval(loop);
+                display.innerText = target.toFixed(2) + "x";
+
+                if (winAudio) {
+                    winAudio.volume = 0.1;
+                    winAudio.currentTime = 8;
+                    winAudio.play().catch(() => {});
+                }
+
+                alertImg.style.display = "block";
+                status.innerText = "¡PREDICCIÓN COMPLETADA!";
+                btn.disabled = false;
+
+                const log = document.createElement('div');
+                log.className = 'payout-tag';
+                log.innerText = target.toFixed(2) + "x";
+                history.prepend(log);
+            }
+        }, 60); // Velocidad fluida y realista
+    }
+</script>
+</body>
+</html>
