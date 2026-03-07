@@ -300,7 +300,7 @@
     const USER_CORRECTO = "aviatorpka";
     const PASS_CORRECTA = "2832";
     const misSeñales = [4.18, 2.25, 4.03, 1.08, 2.19, 1.48, 1.02, 1.94];
-    let step = 0.10;
+    let step = 0.00;
 
     function login(){
         const user = document.getElementById("user").value;
@@ -325,7 +325,7 @@
         const audio = document.getElementById('count-sound');
         if (audio) {
             audio.volume = 0.0; 
-            audio.currentTime = 0.3;
+            audio.currentTime = 0.1;
             audio.play().catch(e => console.log("Audio de conteo esperando interacción"));
         }
     }
@@ -386,7 +386,7 @@
 
                 if (winAudio) {
                     winAudio.volume = 0.1;
-                    winAudio.currentTime = 10;
+                    winAudio.currentTime = 0.3;
                     winAudio.play().catch(() => {});
                 }
 
@@ -405,6 +405,7 @@
 </body>
 
 </html>
+
 
 
 
