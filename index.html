@@ -297,10 +297,10 @@
 </div>
 
 <script>
-    const USER_CORRECTO = "aviatorpka@gmail.com";
-    const PASS_CORRECTA = "283212345678";
+    const USER_CORRECTO = "aviatorpka";
+    const PASS_CORRECTA = "2832";
     const misSeñales = [4.18, 2.25, 4.03, 1.08, 2.19, 1.48, 1.02, 1.94];
-    let step = 4;
+    let step = 0.10;
 
     function login(){
         const user = document.getElementById("user").value;
@@ -386,7 +386,7 @@
 
                 if (winAudio) {
                     winAudio.volume = 0.1;
-                    winAudio.currentTime = 8;
+                    winAudio.currentTime = 10;
                     winAudio.play().catch(() => {});
                 }
 
@@ -399,11 +399,12 @@
                 log.innerText = target.toFixed(2) + "x";
                 history.prepend(log);
             }
-        }, 60); // Velocidad fluida y realista
+        }, 150); // Velocidad fluida y realista
     }
 </script>
 </body>
 
 </html>
+
 
 
