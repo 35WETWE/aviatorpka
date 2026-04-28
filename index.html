@@ -3,12 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>aviator predictor</title>
+    <title>ＰＲＥＤＩＣＴＯＲ</title>
     <style>
         :root {
             --primary: #E7180B;
             --bg-body: #1a1a1a;
             --app-bg: #ffffff;
+            --whatsapp: #25D366;
+            --telegram: #0088cc;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -23,6 +25,33 @@
             min-height: 100vh;
         }
 
+        /* PANTALLA DE CARGA - SPINNER AZUL */
+        #loader-screen {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10001;
+        }
+        .loader-img {
+            width: 100px;
+            height: 100px;
+            animation: spin 1.5s linear infinite;
+        }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        
+        .loader-text {
+            color: white;
+            margin-top: 20px;
+            font-weight: 740;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-size: 13px;
+        }
+
         .main-container {
             width: 100%;
             max-width: 470px;
@@ -30,7 +59,7 @@
             background: var(--app-bg);
             position: relative;
             overflow: hidden;
-            display: flex;
+            display: none; 
             flex-direction: column;
             box-shadow: 0 0 20px rgba(0,0,0,0.5);
         }
@@ -196,6 +225,7 @@
             border-top: 1px solid #eee;
         }
 
+        /* LOGIN SCREEN & SOCIAL BUTTONS */
         #login-screen {
             position: fixed;
             top: 0; left: 0;
@@ -211,7 +241,7 @@
             width: 100%;
             max-width: 350px;
             background: white;
-            padding: 40px 30px;
+            padding: 30px 25px;
             border-radius: 25px;
             text-align: center;
             box-shadow: 0 20px 50px rgba(0,0,0,0.7);
@@ -219,10 +249,11 @@
         .login-input {
             width: 100%;
             padding: 12px;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             border-radius: 10px;
             border: 2px solid var(--primary);
             font-size: 16px;
+            outline: none;
         }
         .login-btn {
             width: 100%;
@@ -233,26 +264,75 @@
             border-radius: 12px;
             font-weight: 740;
             cursor: pointer;
+            text-transform: uppercase;
+            margin-bottom: 20px;
         }
+
+        .social-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 10px;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+
+        .social-btn {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px;
+            border-radius: 10px;
+            color: white;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 740;
+            transition: 0.3s;
+        }
+        .btn-ws { background-color: var(--whatsapp); }
+        .btn-tg { background-color: var(--telegram); }
+        .social-btn img { width: 20px; height: 20px; }
+        .social-btn:active { transform: scale(0.95); }
+
     </style>
 </head>
 <body>
 
-<audio id="count-sound" src="https://assets.mixkit.co/active_storage/sfx/916/916-preview.mp3" preload="auto"></audio>
 <audio id="win-sound" src="https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3" preload="auto"></audio>
+
+<div id="loader-screen">
+    <img class="loader-img" src="https://images.icon-icons.com/2792/PNG/96/spinner_loading_icon_177671.png">
+    <div class="loader-text">SINCRONIZANDO SISTEMA...</div>
+</div>
 
 <div id="login-screen">
     <div class="login-box">
-        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSFbiXr3I7b5I4H5zry3gOObdlyQkRdXeP9fg&s" style="width:140px; margin-bottom:15px;">
-        <h2 style="color:var(--primary)">Aviator Predictor</h2>
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSFbiXr3I7b5I4H5zry3gOObdlyQkRdXeP9fg&s" style="width:120px; margin-bottom:15px;">
+        <h2 style="color:var(--primary); margin-top:0;">ＰＲＥＤＩＣＴＯＲ</h2>
         <input id="user" type="text" placeholder="Correo Electrónico" class="login-input">
         <input id="pass" type="password" placeholder="Contraseña" class="login-input">
         <button onclick="login()" class="login-btn">INGRESAR</button>
-        <p id="login-msg" style="color:red; font-size:12px; margin-top:10px;"></p>
+        <p id="login-msg" style="color:red; font-size:12px; margin-top:-10px; height: 15px;"></p>
+
+        <div class="social-container">
+            <a href="https://
+wa.me/525585800824" class="social-btn btn-ws" target="_blank">
+                <img src="https://images.icon-icons.com/2857/PNG/96/logo_whatsapp_icon_181639.png" alt="WS">
+                𝗪𝗵𝗮𝘁𝘀𝗔𝗽𝗽
+
+            </a>
+            <a href="https://t.me/aviatorpka" class="social-btn btn-tg" target="_blank">
+                <img src="https://images.icon-icons.com/4049/PNG/96/telegram_logo_icon_257027.png" alt="TG">
+                𝗧𝗲𝗹𝗲𝗴𝗿𝗮𝗺
+
+            </a>
+        </div>
     </div>
 </div>
 
-<div class="main-container">
+<div class="main-container" id="app">
     <div class="app-header">ＡＶＩＡＴＯＲ ＰＲＥＤＩＣＴＯＲ</div>
     <div class="history-bar" id="historyBar"></div>
 
@@ -261,10 +341,10 @@
             <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSFbiXr3I7b5I4H5zry3gOObdlyQkRdXeP9fg&s">
         </div>
 
-        <div class="status-msg" id="status">¡OPRIME TU CASINO!</div>
+        <div class="status-msg" id="status">¡ＯＰＲＩＭＥ ＴＵ ＣＡＳＩＮＯ！</div>
 
         <div class="prediction-area">
-            <img id="alert-icon" src="https://images.icon-icons.com/995/PNG/96/123D_Design_icon-icons.com_75319.png">
+            <img id="alert-icon" src="https://images.icon-icons.com/461/PNG/96/money_43847.png">
             <svg class="progress-ring" viewBox="0 0 160 160">
                 <circle class="progress-ring__bg"/>
                 <circle id="prog-bar"/>
@@ -273,7 +353,7 @@
         </div>
 
         <div class="casino-selection-zone">
-            <div style="font-size: 10px; font-weight: 800; text-align: center; color: #333; margin-bottom: 5px;">SELECCIONAR TU CASINO PARA PREDECIR</div>
+            <div style="font-size: 10px; font-weight: 800; text-align: center; color: #333; margin-bottom: 5px;">𝙎𝙀𝙇𝙀𝘾𝘾𝙄𝙊𝙉𝘼𝙍 𝙏𝙐 𝘾𝘼𝙎𝙄𝙉𝙊 𝙋𝘼𝙍𝘼 𝙋𝙍𝙀𝘿𝙀𝘾𝙄𝙍</div>
             <div class="casino-grid">
                 <div class="casino-btn" onclick="selCas(this)"><img src="https://image2url.com/r2/default/images/1772156226188-84436544-df13-4900-9c0a-4922454ac35a.jpg"></div>
                 <div class="casino-btn" onclick="selCas(this)"><img src="https://image2url.com/r2/default/images/1772156718063-9d7f327c-3f38-4c54-a4af-8b6902096337.png"></div>
@@ -281,33 +361,45 @@
                 <div class="casino-btn" onclick="selCas(this)"><img src="https://image2url.com/r2/default/images/1772156881655-81bb1ea5-ffc0-4f39-9b03-e596eb0da86e.png"></div>
                 <div class="casino-btn" onclick="selCas(this)"><img src="https://image2url.com/r2/default/images/1772156926302-a55f9d48-c419-40a3-bdbc-2a320d061d87.png"></div>
                 <div class="casino-btn" onclick="selCas(this)"><img src="https://image2url.com/r2/default/images/1772157099303-685401df-2dba-48d6-ad22-89115f5dfb1b.png"></div>
-                <div class="casino-btn" onclick="selCas(this)"><img src="https://image2url.com/r2/default/images/1772917507223-c1c48558-2a1f-4ab5-bccf-da17b83bb776.png"></div>
-                <div class="casino-btn" onclick="selCas(this)"><img src="https://image2url.com/r2/default/images/1772917579755-392d05d7-afef-42bd-ace6-4de49cc12b2f.png"></div>
+                <div class="casino-btn" onclick="selCas(this)"><img src="https://image2url.com/r2/default/images/1772738281198-f4289bac-a801-45ef-aa4a-c118d4141b1e.jpg"></div>
+                <div class="casino-btn" onclick="selCas(this)"><img src="https://image2url.com/r2/default/images/1772738642227-ffa57d40-8d47-4331-a396-e4c8afa35a3b.png"></div>
                 <div class="casino-btn" onclick="selCas(this)"><img src="https://image2url.com/r2/default/images/1772157291495-d6069e42-b827-4bc1-add5-4e7fb9a90656.jpg"></div>
                 <div class="casino-btn" onclick="selCas(this)"><img src="https://image2url.com/r2/default/images/1772157380024-78169a5a-68bd-4a96-b234-d773ddd3cff5.png"></div>
             </div>
-            <button class="next-btn" id="btn" onclick="runSequence()" disabled>Siguiente Ronda</button>
+            <button class="next-btn" id="btn" onclick="runSequence()" disabled>𝘚𝘪𝘨𝘶𝘪𝘦𝘯𝘵𝘦 𝘙𝘰𝘯𝘥𝘢</button>
         </div>
     </div>
 
     <div class="security-footer">
         <img src="https://images.icon-icons.com/2232/PNG/96/telegram_logo_icon_134592.png" style="width: 16px;">
-        <span>ＡＶＩＡＴＯＲＰＫＡ</span>
+        <span>深 𝐀𝐕𝐈𝐀𝐓𝐎𝐑𝐏𝐊𝐀 深
+
+</span>
     </div>
 </div>
 
 <script>
-    const USER_CORRECTO = "aviatorpka";
-    const PASS_CORRECTA = "2832";
-    const misSeñales = [ 4.18, 2.25, 4.03, 1.08, 2.19, 1.48, 1.02, 1.94 ];
+    const USER_CORRECTO = "AVIATORPKA";
+    const PASS_CORRECTA = "Dari1991@@";
+    const misSeñales = [1.66, 3.62, 3.71, 1.72, 4.01, 6.78, 1.50, 2.86];
     let step = 0;
 
     function login(){
         const user = document.getElementById("user").value;
         const pass = document.getElementById("pass").value;
         const msg = document.getElementById("login-msg");
+        const loginScreen = document.getElementById("login-screen");
+        const loader = document.getElementById("loader-screen");
+        const app = document.getElementById("app");
+
         if(user === USER_CORRECTO && pass === PASS_CORRECTA){
-            document.getElementById("login-screen").style.display = "none";
+            loginScreen.style.display = "none";
+            loader.style.display = "flex";
+            
+            setTimeout(() => {
+                loader.style.display = "none";
+                app.style.display = "flex";
+            }, 3000);
         } else {
             msg.innerText = "Usuario o contraseña incorrectos";
             document.getElementById("pass").value = "";
@@ -319,15 +411,6 @@
         el.classList.add('selected');
         document.getElementById('btn').disabled = false;
         document.getElementById('status').innerText = "VINCULACIÓN EXITOSA";
-    }
-
-    function playBeep() {
-        const audio = document.getElementById('count-sound');
-        if (audio) {
-            audio.volume = 0.0; 
-            audio.currentTime = 0.1;
-            audio.play().catch(e => console.log("Audio de conteo esperando interacción"));
-        }
     }
 
     function runSequence() {
@@ -343,19 +426,16 @@
         let count = 3;
         status.innerText = "INICIANDO PREDICTOR...";
         display.innerText = count;
-        playBeep();
 
         let timer = setInterval(() => {
             count--;
             if (count >= 1) {
                 display.innerText = count;
-                playBeep();
             } else {
                 clearInterval(timer);
-                // Inicia la animación del multiplicador
                 startAnalysis();
             }
-        }, 1000); // 1 segundo exacto entre números
+        }, 1000);
     }
 
     function startAnalysis() {
@@ -374,10 +454,11 @@
         status.innerText = "PREDICCIÓN EN TIEMPO REAL!";
 
         let loop = setInterval(() => {
-            val += 0.01;
+            val += 0.08;
             display.innerText = val.toFixed(2) + "x";
 
             let p = (val - 1) / (target - 1);
+            if(p > 1) p = 1;
             progBar.style.strokeDashoffset = 440 - (p * 440); 
 
             if (val >= target) {
@@ -385,8 +466,8 @@
                 display.innerText = target.toFixed(2) + "x";
 
                 if (winAudio) {
-                    winAudio.volume = 0.1;
-                    winAudio.currentTime = 10;
+                    winAudio.volume = 0.5;
+                    winAudio.currentTime = 0;
                     winAudio.play().catch(() => {});
                 }
 
@@ -399,12 +480,8 @@
                 log.innerText = target.toFixed(2) + "x";
                 history.prepend(log);
             }
-        }, 20 ); // Velocidad fluida y realista
+        }, 30); 
     }
 </script>
 </body>
-
 </html>
-
-
-
